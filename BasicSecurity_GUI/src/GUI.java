@@ -64,9 +64,8 @@ public class GUI extends JFrame {
 		UIManager.put("Menu.font", f);
 		UIManager.put("MenuItem.font", f);
 		UIManager.put("RadioButtonMenuItem.font", f);
-		UIManager.put("RadioButtonMenuItem.foreground",
-				new Color(211, 211, 211));
-		UIManager.put("RadioButtonMenuItem.background", new Color(0, 0, 0));
+
+
 		UIManager.put("Menu.foreground", new Color(211, 211, 211));
 		UIManager.put("Menu.opaque", true);
 		UIManager.put("Menu.background", new Color(0, 0, 0));
