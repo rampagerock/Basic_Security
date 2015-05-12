@@ -22,10 +22,12 @@ public class GUI extends JFrame {
 	private JRadioButtonMenuItem rbMenu;
 	private JPanel contentPanel, labelPanel, btnPanel, centerPanel;
 	private JTextArea text;
-	private boolean encrypt = true;
+	private boolean encrypt, fileSelected;
 	private JButton submitBtn;
 
 	public GUI() {
+		encrypt = true;
+		fileSelected = false;
 		createMenu();
 		createContent();
 		this.setSize(500, 500);
@@ -49,6 +51,36 @@ public class GUI extends JFrame {
 
 		btnPanel = new JPanel();
 		submitBtn = new JButton("submit");
+		submitBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if (!fileSelected) {
+					System.out.println("Please select a file!");
+					JFileChooser chooser = new JFileChooser();
+					int returnValue = chooser.showOpenDialog(null);
+					if (returnValue == JFileChooser.APPROVE_OPTION) {
+						File selectedFile = chooser.getSelectedFile();
+						fileSelected = true;
+						try {
+							BufferedReader in = new BufferedReader(
+									new FileReader(selectedFile));
+							String line = null;
+							while ((line = in.readLine()) != null) {
+								text.append(line + "\n");
+							}
+						} catch (FileNotFoundException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+			}
+		});
 		btnPanel.add(submitBtn);
 
 		contentPanel.add(centerPanel, BorderLayout.CENTER);
@@ -64,7 +96,6 @@ public class GUI extends JFrame {
 		UIManager.put("Menu.font", f);
 		UIManager.put("MenuItem.font", f);
 		UIManager.put("RadioButtonMenuItem.font", f);
-
 
 		UIManager.put("Menu.foreground", new Color(211, 211, 211));
 		UIManager.put("Menu.opaque", true);
@@ -86,12 +117,14 @@ public class GUI extends JFrame {
 				int returnValue = chooser.showOpenDialog(null);
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					File selectedFile = chooser.getSelectedFile();
+					fileSelected = true;
 					try {
-						 BufferedReader in = new BufferedReader(new FileReader(selectedFile));
-						 String line = null;
+						BufferedReader in = new BufferedReader(new FileReader(
+								selectedFile));
+						String line = null;
 						while ((line = in.readLine()) != null) {
-						text.append(line + "\n");
-					}
+							text.append(line + "\n");
+						}
 					} catch (FileNotFoundException e2) {
 						// TODO Auto-generated catch block
 						e2.printStackTrace();
@@ -99,9 +132,6 @@ public class GUI extends JFrame {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					
-
-					
 
 				}
 			}
@@ -137,7 +167,7 @@ public class GUI extends JFrame {
 					obj.setBackground(new Color(131, 139, 139));
 					System.out.println(str);
 				} else {
-					obj.setBackground(new Color(0, 0, 0));
+					obj.setOpaque(false);
 				}
 
 			}
@@ -158,7 +188,7 @@ public class GUI extends JFrame {
 					obj.setBackground(new Color(131, 139, 139));
 					System.out.println(str);
 				} else {
-					obj.setBackground(new Color(0, 0, 0));
+					obj.setOpaque(false);
 				}
 
 			}
