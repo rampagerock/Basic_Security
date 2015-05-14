@@ -1,3 +1,4 @@
+package view;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,7 +21,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class RSAKeyPair {
 	
-	private String user1, user2;
+	private String user;
+	private int users;
 			/*
 				
 			//RSA KeyPair
@@ -60,12 +62,14 @@ public class RSAKeyPair {
 	private Key key;
 	private ObjectOutputStream oOUT;
 	
-	public RSAKeyPair() throws Exception{
-		user1 = "Chris";
-		generateKeyPair();
+	public RSAKeyPair(int users) throws Exception{
+		this.users = users;
+		generateKeyPair(users);
 	}
 	
-	public void generateKeyPair() throws Exception{
+	public void generateKeyPair(int aantal) throws Exception{
+		
+		for(int i = 0; i<users; i++){
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 		keyGen.initialize(1024);
 		KeyPair keyP = keyGen.genKeyPair();
@@ -75,8 +79,11 @@ public class RSAKeyPair {
 		KeyFactory fact = KeyFactory.getInstance("RSA");
 		RSAPublicKeySpec pub = fact.getKeySpec(keyP.getPublic(), RSAPublicKeySpec.class);
 		RSAPrivateKeySpec priv = fact.getKeySpec(keyP.getPrivate(), RSAPrivateKeySpec.class);
-		saveKeys(user1 + "_PubKey.txt", pub.getModulus(), pub.getPublicExponent());
-		saveKeys(user1+"_PrivKey.txt", priv.getModulus(), priv.getPrivateExponent());
+		saveKeys(user + i + "_PubKey.txt", pub.getModulus(), pub.getPublicExponent());
+		saveKeys(user + i +"_PrivKey.txt", priv.getModulus(), priv.getPrivateExponent());
+		}
+		
+		System.out.println("Keys have been created");
 	}
 	
 	public void saveKeys(String fileName,
@@ -93,16 +100,13 @@ public class RSAKeyPair {
 			  }
 	}
 	
-	public void setUser1(String name){
-		this.user1 = name;
+	public void setUser(String name){
+		this.user = name;
 	}
 	
-	public void setUser2(String name){
-		this.user2 = name;
-	}
+/*	public static void main(String[] args) throws Exception{
+		new  RSAKeyPair(2);
+	}*/
 	
-	public static void main(String[] args) throws Exception{
-		new RSAKeyPair();
-	}
 }
 
