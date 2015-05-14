@@ -73,8 +73,25 @@ public class GUIController {
 		changePub.setOnAction(this::openFile);
 		changeFile.setOnAction(this::openFile);
 		
+		welcomeText();
 	}
 	
+	private void welcomeText(){
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(
+					"Tutorial.txt"));
+			String line;
+			while((line = in.readLine()) != null){
+				encFileArea.appendText(line + "\n");
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	private class OnToggleHandler implements ChangeListener<Toggle>{
 
@@ -166,7 +183,9 @@ public class GUIController {
 				break;
 			default: System.out.println("Something went wrong!");
 			}
-			try {
+			/*
+			 * encFileArea.clear();
+			 * try {
 				BufferedReader in = new BufferedReader(new FileReader(
 						selectedFile));
 				String line = null;
@@ -179,7 +198,7 @@ public class GUIController {
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 
 		}
 	}
