@@ -16,7 +16,7 @@ import java.util.Scanner;
 
 import javax.crypto.Cipher;
 
-public class Encrypt {
+public class RSA {
 	/**
 	 * String to hold name of the encryption algorithm.
 	 */
