@@ -217,24 +217,24 @@ public class GUIController {
 		try {
 
 		      // Check if the pair of keys are present else generate those.
-		      if (!application.Encrypt.areKeysPresent()) {
+		      if (!model.Encrypt.areKeysPresent()) {
 		        // Method generates a pair of keys using the RSA algorithm and stores it
 		        // in their respective files
-		       application.Encrypt.generateKey();
+		       model.Encrypt.generateKey();
 		      }
 
 		      final String originalText = "Text to be encrypted ";
 		      ObjectInputStream inputStream = null;
 
 		      // Encrypt the string using the public key
-		      inputStream = new ObjectInputStream(new FileInputStream(application.Encrypt.PUBLIC_KEY_FILE));
+		      inputStream = new ObjectInputStream(new FileInputStream(model.Encrypt.PUBLIC_KEY_FILE));
 		      final PublicKey publicKey = (PublicKey) inputStream.readObject();
-		      final byte[] cipherText = application.Encrypt.encrypt(originalText, publicKey);
+		      final byte[] cipherText = model.Encrypt.encrypt(originalText, publicKey);
 
 		      // Decrypt the cipher text using the private key.
-		      inputStream = new ObjectInputStream(new FileInputStream(application.Encrypt.PRIVATE_KEY_FILE));
+		      inputStream = new ObjectInputStream(new FileInputStream(model.Encrypt.PRIVATE_KEY_FILE));
 		      final PrivateKey privateKey = (PrivateKey) inputStream.readObject();
-		      final String plainText = application.Encrypt.decrypt(cipherText, privateKey);
+		      final String plainText = model.Encrypt.decrypt(cipherText, privateKey);
 
 		      // Printing the Original, Encrypted and Decrypted Text
 		      System.out.println("Original: " + originalText);
