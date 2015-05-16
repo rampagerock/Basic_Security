@@ -56,7 +56,7 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				if (!fileSelected) {
+				/*if (!fileSelected) {
 					System.out.println("Please select a file!");
 					JFileChooser chooser = new JFileChooser();
 					int returnValue = chooser.showOpenDialog(null);
@@ -78,7 +78,7 @@ public class GUI extends JFrame {
 							e1.printStackTrace();
 						}
 					}
-				}
+				}*/
 			}
 		});
 		btnPanel.add(submitBtn);

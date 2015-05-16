@@ -2,21 +2,15 @@ package view;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 
 import javax.swing.JFileChooser;
-
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -71,8 +65,6 @@ public class GUIController {
 		encRb.setToggleGroup(rbGroup);
 		decRb.setToggleGroup(rbGroup);
 		rbGroup.selectedToggleProperty().addListener(new OnToggleHandler());
-	//	SubmitHandler handler = new SubmitHandler();
-	//	submit.setOnAction(handler);
 		
 		changeEnc.setOnAction(this::openFile);
 		changeFile2.setOnAction(this::openFile);
@@ -208,43 +200,6 @@ public class GUIController {
 				e1.printStackTrace();
 			}*/
 
-		}
-		class SubmitHandler implements EventHandler<ActionEvent>{
-
-			@Override
-			public void handle(ActionEvent event) {
-		
-		try {
-
-		      // Check if the pair of keys are present else generate those.
-		      if (!application.Encrypt.areKeysPresent()) {
-		        // Method generates a pair of keys using the RSA algorithm and stores it
-		        // in their respective files
-		       application.Encrypt.generateKey();
-		      }
-
-		      final String originalText = "Text to be encrypted ";
-		      ObjectInputStream inputStream = null;
-
-		      // Encrypt the string using the public key
-		      inputStream = new ObjectInputStream(new FileInputStream(application.Encrypt.PUBLIC_KEY_FILE));
-		      final PublicKey publicKey = (PublicKey) inputStream.readObject();
-		      final byte[] cipherText = application.Encrypt.encrypt(originalText, publicKey);
-
-		      // Decrypt the cipher text using the private key.
-		      inputStream = new ObjectInputStream(new FileInputStream(application.Encrypt.PRIVATE_KEY_FILE));
-		      final PrivateKey privateKey = (PrivateKey) inputStream.readObject();
-		      final String plainText = application.Encrypt.decrypt(cipherText, privateKey);
-
-		      // Printing the Original, Encrypted and Decrypted Text
-		      System.out.println("Original: " + originalText);
-		      System.out.println("Encrypted: " +cipherText.toString());
-		      System.out.println("Decrypted: " + plainText);
-
-		    } catch (Exception e) {
-		      e.printStackTrace();
-		    }
-			}
 		}
 	}
 

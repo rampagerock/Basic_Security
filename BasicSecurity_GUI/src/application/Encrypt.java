@@ -12,6 +12,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Scanner;
 
 import javax.crypto.Cipher;
 
@@ -157,7 +158,16 @@ public class Encrypt {
         generateKey();
       }
 
-      final String originalText = "Text to be encrypted ";
+      Scanner sc = new Scanner(new FileInputStream("Lol.txt"));
+      
+      String originalText = "";
+      String line = null;
+      while(sc.hasNext()){
+    	  line = sc.nextLine();
+    	  originalText += line + "\n";
+      }
+      
+   //   final String originalText = sc.nextLine();
       ObjectInputStream inputStream = null;
 
       // Encrypt the string using the public key

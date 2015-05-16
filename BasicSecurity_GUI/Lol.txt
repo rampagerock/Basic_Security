@@ -1,0 +1,3 @@
+Test
+Of het encrypteren van tekst
+In files werkt!
