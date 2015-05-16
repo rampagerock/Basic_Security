@@ -144,8 +144,9 @@ public class GUIController {
 	public void generate(ActionEvent Event) {
 		String n1 = nameField.getText();
 		String n2 = nameFieldCor.getText();
-		model.Encrypt.generateKey(n1);
-		model.Encrypt.generateKey(n2);
+		model.RSA.generateKey(n1);
+		model.RSA.generateKey(n2);
+		//model.DES.GenerateDESKey();
 	}
 
 	public void disableEncrypt() {
@@ -245,6 +246,8 @@ public class GUIController {
 					/*
 					 * DES Encryption van file!
 					 */
+					
+					
 
 					/*
 					 * RSA encryptie van de DES Key met de public key van
@@ -259,7 +262,7 @@ public class GUIController {
 							"public.key"));
 					final PublicKey publicKey = (PublicKey) inputStream
 							.readObject();
-					cipherText = model.Encrypt.encrypt(text, publicKey);
+					cipherText = model.RSA.encrypt(text, publicKey);
 					
 					FileOutputStream out = new FileOutputStream("encDes.txt"); // wegschrijven geencrypteerde des sleutel
 
@@ -285,7 +288,7 @@ public class GUIController {
 					/* model.Encrypt.PRIVATE_KEY_FILE */"private.key"));
 					final PrivateKey privateKey = (PrivateKey) inputStream
 							.readObject();
-					plainText = model.Encrypt.decrypt(cipherText,
+					plainText = model.RSA.decrypt(cipherText,
 							privateKey);
 
 					/*

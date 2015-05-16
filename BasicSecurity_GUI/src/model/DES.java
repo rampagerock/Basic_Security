@@ -1,0 +1,103 @@
+package model;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.security.Key;
+import java.util.Scanner;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
+public class DES
+{
+	public static void GenerateDESKey()
+	{
+		try
+		{
+			KeyGenerator keygenerator = KeyGenerator.getInstance("DES");
+			SecretKey myDesKey = keygenerator.generateKey();
+			File KeyFile = new File("DESKey.key");
+
+			// Create file to store DES key
+			if (KeyFile.getParentFile() != null)
+			{
+				KeyFile.getParentFile().mkdirs();
+			}
+			KeyFile.createNewFile();
+
+			// Saving the key in a file
+			ObjectOutputStream KeyOS = new ObjectOutputStream(
+					new FileOutputStream(KeyFile));
+			KeyOS.writeObject(myDesKey);
+			KeyOS.close();
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static byte[] EncryptWithDES(String inputMessageTextFile)
+	{
+		try
+		{
+			// Create the cipher
+			Cipher desCipher = Cipher.getInstance("DES");
+
+			// Initialize the cipher for encryption
+			ObjectInputStream inputStream = null;
+			inputStream = new ObjectInputStream(new FileInputStream(
+					"DESKey.key"));
+			desCipher.init(Cipher.ENCRYPT_MODE, (Key) inputStream.readObject());
+			inputStream.close();
+
+			// sensitive information
+			byte[] text;
+
+			Scanner sc = new Scanner(new FileInputStream(inputMessageTextFile));
+			String originalText = "";
+			String tempText = null;
+			while (sc.hasNext())
+			{
+				tempText = sc.nextLine();
+				originalText += tempText + "\n";
+			}
+
+			text = originalText.getBytes();
+
+			byte[] textEncrypted = desCipher.doFinal(text);
+			return textEncrypted;
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	public static void DecryptWithDES(byte[] textEncrypted)
+	{
+		try
+		{
+			// Create the cipher
+			Cipher desCipher = Cipher.getInstance("DES");
+
+			// Initialize the same cipher for decryption
+			ObjectInputStream inputStream = null;
+			inputStream = new ObjectInputStream(new FileInputStream(
+					"DESKey.key"));
+			desCipher.init(Cipher.DECRYPT_MODE, (Key) inputStream.readObject());
+			inputStream.close();
+
+			// Decrypt the text
+			byte[] textDecrypted = desCipher.doFinal(textEncrypted);
+
+			System.out.println("Text Decryted : " + new String(textDecrypted));
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+}
