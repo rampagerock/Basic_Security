@@ -1,6 +1,4 @@
 //TODO
-Decryptie file 3
-Vergelijken Hashes
 filechooser boxes linken
 output verplaatsen naar textarea
 Test code verwijderen
