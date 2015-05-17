@@ -3,6 +3,7 @@ package model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.Key;
@@ -27,8 +28,7 @@ public class DES {
 			KeyFile.createNewFile();
 
 			// Saving the key in a file
-			ObjectOutputStream KeyOS = new ObjectOutputStream(
-					new FileOutputStream(KeyFile));
+			ObjectOutputStream KeyOS = new ObjectOutputStream(new FileOutputStream(KeyFile));
 			KeyOS.writeObject(myDesKey);
 			KeyOS.close();
 		} catch (Exception e) {
@@ -43,8 +43,7 @@ public class DES {
 
 			// Initialize the cipher for encryption
 			ObjectInputStream inputStream = null;
-			inputStream = new ObjectInputStream(new FileInputStream(
-					"DESKey.key"));
+			inputStream = new ObjectInputStream(new FileInputStream("DESKey.key"));
 			desCipher.init(Cipher.ENCRYPT_MODE, (Key) inputStream.readObject());
 			inputStream.close();
 
@@ -52,17 +51,15 @@ public class DES {
 			byte[] text;
 
 			Scanner sc = new Scanner(new FileInputStream(inputMessageTextFile));
-			String originalText = "";
-			String tempText = null;
+			String fileContent = "";
 			while (sc.hasNext()) {
-				tempText = sc.nextLine();
-				originalText += tempText + "\n";
+				fileContent += sc.nextLine();
 			}
 			sc.close();
 
-			text = Base64.getEncoder().encode(originalText.getBytes("UTF-8"));
+			//text = Base64.getEncoder().encode(fileContent.getBytes("UTF-8"));
 			
-			byte[] textEncrypted = desCipher.doFinal(text);
+			byte[] textEncrypted = desCipher.doFinal(fileContent.getBytes());
 			return textEncrypted;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -71,17 +68,15 @@ public class DES {
 
 	}
 
-	public static String DecryptWithDES(byte[] textEncrypted, String keyPath)
-	{byte[] textDecrypted = null;
-		try
-		{
+	public static byte[] DecryptWithDES(byte[] textEncrypted, String keyPath){
+		byte[] textDecrypted = null;
+		try{
 			// Create the cipher
 			Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
 
 			// Initialize the same cipher for decryption
 			ObjectInputStream inputStream = null;
-			inputStream = new ObjectInputStream(new FileInputStream(
-					keyPath));
+			inputStream = new ObjectInputStream(new FileInputStream(keyPath));
 			desCipher.init(Cipher.DECRYPT_MODE, (Key) inputStream.readObject());
 			inputStream.close();
 
@@ -90,14 +85,13 @@ public class DES {
 			 
 			 /*byte[] encryptedBytes = cipher.doFinal(plainBytes);
  
-     return encryptedBytes.toString();*/
+     		return encryptedBytes.toString();*/
 
 			//System.out.println("Text Decryted : " + new String(textDecrypted));
-		} catch (Exception e)
-		{
+		} catch (Exception e){
 			e.printStackTrace();
 		}
 		
-		return Base64.getEncoder().encodeToString(textDecrypted);
+		return textDecrypted;
 	}
 }

@@ -1,5 +1,7 @@
 package view;
 
+import java.nio.file.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -20,6 +23,7 @@ import java.util.Scanner;
 import javax.crypto.Cipher;
 import javax.swing.JFileChooser;
 
+import model.Hasher;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -118,21 +122,15 @@ public class GUIController {
 	private class OnToggleHandler implements ChangeListener<Toggle> {
 
 		@Override
-		public void changed(ObservableValue<? extends Toggle> ov, Toggle t,
-				Toggle t1) {
-			// TODO Auto-generated method stub
-			System.out.println("Observable : " + ov);
-			System.out.println("Old Value : " + t);
-			System.out.println("New Value : " + t1);
-			RadioButton rb = (RadioButton) t1.getToggleGroup()
-					.getSelectedToggle();
+		public void changed(ObservableValue<? extends Toggle> ov, Toggle t, Toggle t1) {
+			RadioButton rb = (RadioButton) t1.getToggleGroup().getSelectedToggle();
 			switch (rb.getId()) {
-			case "encRb":
-				encrypt = true;
-				break;
-			case "decRb":
-				encrypt = false;
-				break;
+				case "encRb":
+					encrypt = true;
+					break;
+				case "decRb":
+					encrypt = false;
+					break;
 			}
 
 			if (encrypt) {
@@ -195,7 +193,6 @@ public class GUIController {
 
 	private void openFile(ActionEvent event) {
 		Button name = (Button) event.getSource();
-		System.out.println(name);
 		JFileChooser chooser = new JFileChooser();
 		int returnValue = chooser.showOpenDialog(null);
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -227,9 +224,8 @@ public class GUIController {
 			 * BufferedReader(new FileReader( selectedFile)); String line =
 			 * null; while ((line = in.readLine()) != null) {
 			 * encFileArea.appendText(line + "\n"); } } catch
-			 * (FileNotFoundException e2) { // TODO Auto-generated catch block
-			 * e2.printStackTrace(); } catch (IOException e1) { // TODO
-			 * Auto-generated catch block e1.printStackTrace(); }
+			 * (FileNotFoundException e2) { 
+			 * e2.printStackTrace(); } catch (IOException e1) { 
 			 */
 
 		}
@@ -243,125 +239,158 @@ public class GUIController {
 
 			ObjectInputStream inputStream;
 			byte[] cipherText = null;
-			String text = null;
+			String desKeyString = null;
 			String plainText = null;
 			try {
-
 				if (encrypt) {
-
 					/*
-					 * DES Encryption van file!
-					 * 
-					 *==> File_1
+					 * DES Encryption van Message
+					 * get file1.txt
 					 */
-					File file = new File(textFile.getText());
-					System.out.println(file.getName());
+					File originalFile = new File(textFile.getText());
+					System.out.println("250> Encrypt file: " + originalFile.getName());
+					//read file content				
+					{//Test code
+						Scanner fileReader = new Scanner(originalFile);
+						String fileContentString = "";
+						while(fileReader.hasNext()){
+							 fileContentString += fileReader.nextLine();						
+						}
+						System.out.println("259> File content: " + fileContentString);
+					}
+					//genereate des key
 					model.DES.GenerateDESKey();
-					byte[] encFile = model.DES.EncryptWithDES(file.toString());
-					FileOutputStream fOS = new FileOutputStream("File_1.txt");
-					fOS.write(encFile);
-					fOS.close();
+					
+					//encrypt content using des key
+					byte[] encFile = model.DES.EncryptWithDES(originalFile.toString());
+					
+					//write encrypted content to File_1.txt
+					FileOutputStream fileOutputStream = new FileOutputStream("File_1.txt");
+					fileOutputStream.write(encFile);
+					fileOutputStream.close();				
+					
 					/*
-					 * RSA encryptie van de DES Key met de public key van
-					 * ontvanger
-					 * 
-					 * File_2
+					 * Encrypt DES key using Public B
+					 * get file2.txt
 					 */
 					Scanner sc = new Scanner(new FileInputStream("DESKey.key"));
-					text = sc.next();
-					System.out.println(Base64.getEncoder().encodeToString(
-							text.getBytes()));
+					desKeyString = sc.next();
+					
+					System.out.println("290> desKey(Object): " + desKeyString);
+
 					inputStream = null;
 
-					// Encrypt the string using the public key
-					inputStream = new ObjectInputStream(new FileInputStream(
-							"public.key"));
-					final PublicKey publicKey = (PublicKey) inputStream
-							.readObject();
-					// cipherText = model.RSA.encrypt(text, publicKey);
+					//Get public key from file
+					inputStream = new ObjectInputStream(new FileInputStream("B_publicKey.key"));
+					final PublicKey publicKey = (PublicKey) inputStream.readObject();
+					
+					//Encrypt using public key
 					Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 					cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-					String encKey = Base64.getEncoder().encodeToString(
-							cipher.doFinal(text.getBytes()));
-					System.out.println("Enc des : " + encKey);
+					//String encKey = Base64.getEncoder().encodeToString(cipher.doFinal(desKeyString.getBytes()));
+					byte[] encKey = cipher.doFinal(desKeyString.getBytes());
 
-					FileOutputStream out = new FileOutputStream("File_2.key"); // wegschrijven
-																				// geencrypteerde
-																				// des
-																				// sleutel
-					ObjectOutputStream oOUT = new ObjectOutputStream(out);
-					oOUT.writeObject(encKey);
-					oOUT.close();
+					System.out.println("304>: encKey first byte " + encKey[0]);
+					
+					//Save encrypted des key to file
+					FileOutputStream out = new FileOutputStream("File_2.txt"); 	
+					out.write(encKey);
+					out.close();
+					
 					/*
 					 * Hash van file (oorspronkelijke boodschap)
 					 */
-						
+					Scanner fileReader = new Scanner(originalFile);
+					String fileContentString = "";
+					while(fileReader.hasNext()){
+						 fileContentString += fileReader.nextLine();						
+					}
+					String hashString = Hasher.getHash(fileContentString);
+					System.out.println(fileContentString);
+					System.out.println("316> Hash1: " + hashString);
+					
 					/*
-					 * Encryptie hash met private key van de gebruiker
-					 * 
-					 * FIle_3
+					 * Encrypt hash using privateA
+					 * get file3.txt
 					 */
+					//Get private key from file
+					inputStream = new ObjectInputStream(new FileInputStream("A_privateKey.key"));
+					final PrivateKey privateKey = (PrivateKey) inputStream.readObject();
+					
+					//Encrypt using private key
+					cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+					cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+					byte[] encHash = cipher.doFinal(desKeyString.getBytes());
+					System.out.println("330> encHash:" + encHash);
+
+					//save hash to file
+					out = new FileOutputStream("File_3.txt"); 	
+					out.write(encHash);
+					out.close();
 
 				}
 
 				if (!encrypt) {
 					/*
-					 * 
-					 * Decryptie van de DES Key
-					 * 
-					 * Hier moet de geencrypteerde sleutel worden uitgelezen en
-					 * worden gedecrypteerd
-					 * 
-					 * File_2
+					 * Decrypt File2 using Private B 
+					 * get DES Key
 					 */
-					inputStream = new ObjectInputStream(new FileInputStream(
-					/* model.Encrypt.PRIVATE_KEY_FILE */"private.key"));
-					final PrivateKey privateKey = (PrivateKey) inputStream
-							.readObject();
-					inputStream = new ObjectInputStream(new FileInputStream(
-							"File_2.key"));
-					String enc = (String) inputStream.readObject();
-					byte[] encBytes = enc.getBytes();
+					
+					//get private key B
+					inputStream = new ObjectInputStream(new FileInputStream("B_privateKey.key"));
+					final PrivateKey privateKey = (PrivateKey) inputStream.readObject();
+					
+					//get file2.txt
+					File file = new File("File_2.txt");
+					byte[] encData = new byte[(int) file.length()];
+					try {
+					    new FileInputStream(file).read(encData);
+					} catch (Exception e) {
+					    e.printStackTrace();
+					}
+					System.out.println("357>: encData first byte " + encData[0]);
+					
+					//decode using private key
 					Cipher dipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 					dipher.init(Cipher.DECRYPT_MODE, privateKey);
-					byte[] decrypted = new byte[1024];
-							decrypted = dipher.doFinal(Base64.getDecoder()
-							.decode(encBytes));
-					System.out.println("Dec des : "
-							+ Base64.getEncoder().encodeToString(decrypted));
-					/*
-					 * plainText = model.RSA.decrypt(cipherText, privateKey);
-					 */
+
+					byte[] decrypted = dipher.doFinal(encData);
+					System.out.println("365> DesKey first 2 bytes:" + decrypted[0] + " " + decrypted[1]);
 
 					/*
-					 * 
-					 * Decryptie boodschap met DES Key
-					 * 
-					 * File_1
+					 * Decrypt Message (file_1.txt) using decrypted DES key
+					 * get message
 					 */
-					Scanner sc = new Scanner(new FileInputStream("File_1.txt"));
-					String encTxt = "";
-					while (sc.hasNext()) {
-						encTxt += sc.nextLine();
+					file = new File("File_1.txt");
+					byte[] encTxtBytes = new byte[(int) file.length()];
+					try {
+					    new FileInputStream(file).read(encTxtBytes);
+					} catch (Exception e) {
+					    e.printStackTrace();
 					}
-					//encryptie: byte[] text = Base64.getEncoder().encode(originalText.getBytes("UTF-8"));
-					System.out.println(encTxt);
-					System.out.println(encTxt.getBytes("UTF-8"));
-					System.out.println(Base64.getDecoder().decode(encTxt));//ERROR
-					System.out.println(Base64.getDecoder().decode(encTxt.getBytes(/*"UTF-8"*/)));
-					byte[] encTxtBytes = Base64.getDecoder().decode(encTxt.getBytes(/*"UTF-8"*/));//ERROR
-
-					String decText = model.DES.DecryptWithDES(encTxtBytes, "DESKey.key");
-
-					FileOutputStream fOS = new FileOutputStream("originText");
-					Formatter form = new Formatter(fOS);
-					form.format(decText);
-					form.close();
+					System.out.println("373> encrypted text: " + encTxtBytes);
+					
+					byte[] decText = model.DES.DecryptWithDES(encTxtBytes, "DESKey.key");
+					
+					//write dectext to file
+					FileOutputStream out = new FileOutputStream("File.txt"); 	
+					out.write(decText);
+					out.close();
 					/*
 					 * 
 					 * Berekenen Hash van boodschap
 					 */
-
+					FileInputStream ips = new FileInputStream("File.txt");
+					Scanner fileReader = new Scanner(ips);
+					String fileContentString = "";
+					while(fileReader.hasNext()){
+						 fileContentString += fileReader.nextLine();						
+					}
+					
+					
+					String hash = Hasher.getHash(fileContentString);
+					System.out.println(fileContentString);
+					System.out.println("394> 2nd hash: " + hash);
 					/*
 					 * Decryptie hash file(file 3) met public key gebruiker
 					 * 
@@ -409,7 +438,6 @@ public class GUIController {
 	}
 
 	public void setMainApp(MainApplication mainApp) {
-		// TODO Auto-generated method stub
 		this.mainApp = mainApp;
 	}
 

@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 public class Hasher {
 	public static String getHash(String text) throws Exception
     { 
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
         md.update(text.getBytes());
  
         byte byteData[] = md.digest();
