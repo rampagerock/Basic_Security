@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import java.lang.*?>
@@ -7,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="548.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.GUIController">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="548.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.GUIController">
    <top>
       <GridPane prefHeight="201.0" prefWidth="799.0" BorderPane.alignment="CENTER">
         <columnConstraints>
@@ -72,10 +73,13 @@
       </GridPane>
    </top>
    <center>
-      <TextArea fx:id="encFileArea" prefHeight="301.0" prefWidth="770.0" BorderPane.alignment="CENTER">
+      <TextArea fx:id="encFileArea" editable="false" prefHeight="301.0" prefWidth="770.0" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </BorderPane.margin></TextArea>
+         </BorderPane.margin>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></TextArea>
    </center>
    <bottom>
       <HBox prefHeight="79.0" prefWidth="780.0" BorderPane.alignment="CENTER_LEFT">

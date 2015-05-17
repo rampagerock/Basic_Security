@@ -1,1 +1,19 @@
-Jonas is nog steeds gayhaha
+ExtraCD: enabled
+SexyCooldown: enabled
+autoturnin: disabled
+HandyNotes: enabled
+QuickTalents: enabled
+AtlasLoot: disabled
+AtlasLoot_Loader: disabled
+AtlasLoot_Crafting: disabled
+AtlasLoot_Cataclysm: disabled
+AtlasLoot_BurningCrusade: disabled
+AtlasLoot_ClassicWoW: disabled
+AtlasLoot_MistsofPandaria: disabled
+AtlasLoot_WorldEvents: disabled
+AtlasLoot_WrathoftheLichKing: disabled
+BattlegroundTargets: disabled
+TradeSkillMaster_Warehousing: disabled
+tradeskillmaster_restocker: enabled
+BL_Cooldown: disabled
+InterruptBar: disabled

@@ -1,6 +1,5 @@
 package view;
 
-import java.nio.file.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,20 +8,17 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.Base64;
-import java.util.Formatter;
 import java.util.Scanner;
 
 import javax.crypto.Cipher;
 import javax.swing.JFileChooser;
 
+import model.DES;
 import model.Hasher;
+import model.RSA;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -99,21 +95,27 @@ public class GUIController {
 		genBtn.setOnAction(this::generate);
 
 		welcomeText();
+		encFileArea.textProperty().addListener(new ChangeListener<Object>(){
+
+			@Override
+			public void changed(ObservableValue<? extends Object> observable,
+					Object oldValue, Object newValue) {
+				encFileArea.setScrollTop(Double.MAX_VALUE);
+			}
+			
+		});
 	}
 
 	private void welcomeText() {
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(
-					"Tutorial.txt"));
+			BufferedReader in = new BufferedReader(new FileReader("Tutorial.txt"));
 			String line;
 			while ((line = in.readLine()) != null) {
 				encFileArea.appendText(line + "\n");
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -147,9 +149,8 @@ public class GUIController {
 	public void generate(ActionEvent Event) {
 		String n1 = nameField.getText();
 		String n2 = nameFieldCor.getText();
-		model.RSA.generateKey(n1);
-		model.RSA.generateKey(n2);
-		// model.DES.GenerateDESKey();
+		RSA.generateKey(n1);
+		RSA.generateKey(n2);
 	}
 
 	public void disableEncrypt() {
@@ -218,17 +219,7 @@ public class GUIController {
 			default:
 				System.out.println("Something went wrong!");
 			}
-			/*
-			 * encFileArea.clear(); try { BufferedReader in = new
-			 * BufferedReader(new FileReader( selectedFile)); String line =
-			 * null; while ((line = in.readLine()) != null) {
-			 * encFileArea.appendText(line + "\n"); } } catch
-			 * (FileNotFoundException e2) { 
-			 * e2.printStackTrace(); } catch (IOException e1) { 
-			 */
-
 		}
-
 	}
 
 	class SubmitHandler implements EventHandler<ActionEvent> {
@@ -241,14 +232,27 @@ public class GUIController {
 			String desKeyString = null;
 			String plainText = null;
 			try {
+				File originalFile = new File(textFile.getText());
+				File file1 = new File("File_1.txt");
+				File file2 = new File("File_2.txt");
+				File file3 = new File("File_3.txt");
+				
 				if (encrypt) {
+					while(textFile.getText().equals("")){
+						encFileArea.appendText("\n----------------------------------------------------------------------------------\n");
+						encFileArea.appendText("Please provide paths to all the requested files\n");
+						return;
+					}
 					/*
 					 * DES Encryption van Message
 					 * get file1.txt
-					 */
-					File originalFile = new File(textFile.getText());
+					 */	
+					
 					System.out.println("250> Encrypt file: " + originalFile.getName());
-					//read file content				
+					encFileArea.appendText("\n----------------------------------------------------------------------------------\n");
+					encFileArea.appendText("Encrypting " + originalFile.getAbsolutePath() + "\n");
+					
+					//read file content		
 					{//Test code
 						Scanner fileReader = new Scanner(originalFile);
 						String fileContentString = "";
@@ -258,20 +262,24 @@ public class GUIController {
 						System.out.println("259> File content: " + fileContentString);
 					}
 					//genereate des key
-					model.DES.GenerateDESKey();
+					DES.GenerateDESKey();
 					
 					//encrypt content using des key
-					byte[] encFile = model.DES.EncryptWithDES(originalFile.toString());
+					byte[] encFile = DES.EncryptWithDES(originalFile.toString());
 					
 					//write encrypted content to File_1.txt
-					FileOutputStream fileOutputStream = new FileOutputStream("File_1.txt");
+					
+					encFileArea.appendText("Writing encrypted message to " + file1.getAbsolutePath() + "\n");
+					FileOutputStream fileOutputStream = new FileOutputStream(file1);
 					fileOutputStream.write(encFile);
-					fileOutputStream.close();				
+					fileOutputStream.close();
+					
 					
 					/*
 					 * Encrypt DES key using Public B
 					 * get file2.txt
 					 */
+					encFileArea.appendText("Encrypting DES key\n");
 					Scanner sc = new Scanner(new FileInputStream("DESKey.key"));
 					desKeyString = sc.next();
 
@@ -289,27 +297,33 @@ public class GUIController {
 					System.out.println("304> encrypted des: " + encKey[0] + " " + encKey[1]);
 					
 					//Save encrypted des key to file
-					FileOutputStream out = new FileOutputStream("File_2.txt"); 	
+					encFileArea.appendText("Writing encrypted message to " + file2.getAbsolutePath() + "\n");
+					FileOutputStream out = new FileOutputStream(file2); 	
 					out.write(encKey);
 					out.close();
+					
 					
 					/*
 					 * Hash van file (oorspronkelijke boodschap)
 					 */
+					encFileArea.appendText("Hashing original message\n");
 					Scanner fileReader = new Scanner(originalFile);
 					String fileContentString = "";
 					while(fileReader.hasNext()){
-						 fileContentString += fileReader.nextLine();						
+						 fileContentString += fileReader.nextLine();
+						 encFileArea.appendText("...");
 					}
 					String hashString = Hasher.getHash(fileContentString);
 					System.out.println(fileContentString);
 					System.out.println("316> hash A: " + hashString);
-					
+					encFileArea.appendText("\nHash: " + hashString + "\n");
 					/*
 					 * Encrypt hash using privateA
 					 * get file3.txt
 					 */
+					
 					//Get private key from file
+					encFileArea.appendText("Encrypting Hash using RSA\n");
 					inputStream = new ObjectInputStream(new FileInputStream("A_privateKey.key"));
 					final PrivateKey privateKey = (PrivateKey) inputStream.readObject();
 					
@@ -320,6 +334,7 @@ public class GUIController {
 					System.out.println("330> encrypted Hash A: " + encHash[0] + " " + encHash[1]);
 					
 					//save hash to file
+					encFileArea.appendText("Saving Encrypted hash to " + file3.getAbsolutePath() + "\n");
 					out = new FileOutputStream("File_3.txt"); 	
 					out.write(encHash);
 					out.close();
@@ -327,25 +342,35 @@ public class GUIController {
 				}
 
 				if (!encrypt) {
+					while(textEnc.getText().equals("") || textFile2.getText().equals("") || textFile3.getText().equals("") || textPriv.getText().equals("") || textPub.getText().equals("")){
+						encFileArea.appendText("\n----------------------------------------------------------------------------------\n");
+						encFileArea.appendText("Please provide paths to all the requested files\n");
+						return;
+					}
 					/*
 					 * Decrypt File2 using Private B 
 					 * get DES Key
 					 */
+					File encryptedMessageFile = new File(textEnc.getText());
+					File privateKeyFile = new File(textPriv.getText());
+					File publicKeyFile = new File(textPub.getText());
+					
+					encFileArea.appendText("\n----------------------------------------------------------------------------------\n");
+					encFileArea.appendText("Decypting " + encryptedMessageFile.getAbsolutePath() + "\n");
 					
 					//get private key B
-					inputStream = new ObjectInputStream(new FileInputStream("B_privateKey.key"));
+					inputStream = new ObjectInputStream(new FileInputStream(privateKeyFile));
 					final PrivateKey privateKey = (PrivateKey) inputStream.readObject();
 					
 					//get file2.txt
-					File file = new File("File_2.txt");
-					byte[] encData = new byte[(int) file.length()];
+					byte[] encData = new byte[(int) file2.length()];
 					try {
-					    new FileInputStream(file).read(encData);
+					    new FileInputStream(file2).read(encData);
 					} catch (Exception e) {
 					    e.printStackTrace();
 					}
 					System.out.println("357> encrypted DES B: " + encData[0] + " " + encData[1]);
-					
+					encFileArea.appendText("Decypting DES key from " + file2.getAbsolutePath() + "\n");
 					//decode using private key
 					Cipher dipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 					dipher.init(Cipher.DECRYPT_MODE, privateKey);
@@ -357,16 +382,16 @@ public class GUIController {
 					 * Decrypt Message (file_1.txt) using decrypted DES key
 					 * get message
 					 */
-					file = new File("File_1.txt");
-					byte[] encTxtBytes = new byte[(int) file.length()];
+					encFileArea.appendText("Decypting message using DES key\n");
+					byte[] encTxtBytes = new byte[(int) file1.length()];
 					try {
-					    new FileInputStream(file).read(encTxtBytes);
+					    new FileInputStream(file1).read(encTxtBytes);
 					} catch (Exception e) {
 					    e.printStackTrace();
 					}
 					System.out.println("373> encrypted text: " + encTxtBytes[0] + " " + encTxtBytes[1]);
 					
-					byte[] decText = model.DES.DecryptWithDES(encTxtBytes, "DESKey.key");
+					byte[] decText = DES.DecryptWithDES(encTxtBytes, "DESKey.key");
 					
 					//write dectext to file
 					FileOutputStream out = new FileOutputStream("File.txt"); 	
@@ -376,32 +401,35 @@ public class GUIController {
 					/*
 					 * Berekenen Hash van boodschap
 					 */
+					encFileArea.appendText("Calculating hash from recieved file\n");
 					FileInputStream ips = new FileInputStream("File.txt");
 					Scanner fileReader = new Scanner(ips);
 					String fileContentString = "";
 					while(fileReader.hasNext()){
-						 fileContentString += fileReader.nextLine();						
+						 fileContentString += fileReader.nextLine();		
+						 encFileArea.appendText("...");
 					}
 					
 					String hash = Hasher.getHash(fileContentString);
 					System.out.println(fileContentString);
 					System.out.println("394> Hash B: " + hash);
+					encFileArea.appendText("\nHash: " + hash + "\n");
 					
 					/*
 					 * Decryptie hash file(file 3) met public key gebruikerA
 					 * 
 					 * File_3
 					 */
+					encFileArea.appendText("Decrypting recieved hash file " + file3.getAbsolutePath() + "\n");
 					{
 						//get public key A
-						inputStream = new ObjectInputStream(new FileInputStream("A_publicKey.key"));
+						inputStream = new ObjectInputStream(new FileInputStream(publicKeyFile));
 						final PublicKey publicKey = (PublicKey) inputStream.readObject();
 						
 						//get file2.txt
-						file = new File("File_3.txt");
-						byte[] encHash = new byte[(int) file.length()];
+						byte[] encHash = new byte[(int) file3.length()];
 						try {
-						    new FileInputStream(file).read(encHash);
+						    new FileInputStream(file3).read(encHash);
 						} catch (Exception e) {
 						    e.printStackTrace();
 						}
@@ -425,6 +453,7 @@ public class GUIController {
 					/*
 					 * Vergelijken verkregen hash met zelf berekende hash
 					 */
+					encFileArea.appendText("Checking if recieved hash equals calculated hash\n");
 					ips = new FileInputStream("HashAfter.txt");
 					fileReader = new Scanner(ips);
 					String hashaftercontent = "";
@@ -432,12 +461,20 @@ public class GUIController {
 						hashaftercontent += fileReader.nextLine();						
 					}
 					if(hashaftercontent.equals(hash)){
-						System.out.println("435> Hashes are equal whoop tie fucking doo");
+						encFileArea.appendText("Hashes are equal, file transfer OK.\n");
+						encFileArea.appendText("Opening File...\n");
+						encFileArea.appendText("*******************************************************************************\n");
+						File messageFile = new File("File.txt");
+						ips = new FileInputStream(messageFile);
+						fileReader = new Scanner(ips);
+						while(fileReader.hasNext()){
+							encFileArea.appendText(fileReader.nextLine() + "\n");
+						}
+						encFileArea.appendText("*******************************************************************************\n");
 					}else {
-						System.out.println("437> hashAfter: " + hashaftercontent);
-						System.out.println("438> hashBefore: " + hash);
+						encFileArea.appendText("Hashes are not equal, please request the message again.\n");
+						encFileArea.appendText("----------------------------------------------------------------------------------\n");
 					}
-
 				}
 
 			} catch (Exception e) {
