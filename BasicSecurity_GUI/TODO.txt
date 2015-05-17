@@ -1,0 +1,4 @@
+	**TODO**
+-TabIndex
+-Check if keytext field are empty before generating
+-check if Keys exist before encrypting/decrypting
