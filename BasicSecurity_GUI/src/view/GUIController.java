@@ -261,9 +261,11 @@ public class GUIController {
 					/*
 					 * RSA encryptie van de DES Key met de public key van
 					 * ontvanger
+					 * 
 					 */
 					Scanner sc = new Scanner(new FileInputStream("Key.key"));
 					text = sc.next();
+					System.out.println(Base64.getEncoder().encodeToString(text.getBytes()));
 					inputStream = null;
 
 					// Encrypt the string using the public key
@@ -288,7 +290,7 @@ public class GUIController {
 					/*
 					 * Encryptie hash met private key van de gebruiker
 					 */
-
+					
 				}
 
 				if (!encrypt) {
@@ -316,20 +318,20 @@ public class GUIController {
 					 * 
 					 * Decryptie boodschap met DES Key
 					 */
-				/*	Scanner sc = new Scanner(new FileInputStream("encText.txt"));
+					Scanner sc = new Scanner(new FileInputStream("encText.txt"));
 					String encTxt = "";
 					while(sc.hasNext()){
-						encTxt += sc.next() + "\n";
+						encTxt += sc.nextLine();
 					}
 					byte[] encTxtBytes = encTxt.getBytes();
 					
-					model.DES.DecryptWithDES(encTxtBytes);*/
+					model.DES.DecryptWithDES(encTxtBytes);
 
 					/*
 					 * 
 					 * Berekenen Hash van boodschap
 					 */
-
+					
 					/*
 					 * Decryptie hash file(file 3) met public key gebruiker
 					 */
