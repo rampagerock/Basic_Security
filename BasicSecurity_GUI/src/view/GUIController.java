@@ -1,7 +1,6 @@
 package view;
 
 import java.nio.file.*;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -376,6 +375,7 @@ public class GUIController {
 					FileOutputStream out = new FileOutputStream("File.txt"); 	
 					out.write(decText);
 					out.close();
+					
 					/*
 					 * 
 					 * Berekenen Hash van boodschap
@@ -391,11 +391,50 @@ public class GUIController {
 					String hash = Hasher.getHash(fileContentString);
 					System.out.println(fileContentString);
 					System.out.println("394> 2nd hash: " + hash);
+					
 					/*
 					 * Decryptie hash file(file 3) met public key gebruiker
 					 * 
 					 * File_3
 					 */
+					{
+						file = new File("File_3.txt");
+						byte[] decrHashBytes = new byte[(int) file.length()];
+						try {
+						    new FileInputStream(file).read(decrHashBytes);
+						} catch (Exception e) {
+						    e.printStackTrace();
+						}
+						System.out.println("407> decrypted hash: " + decrHashBytes);
+						
+						//get private key B
+						inputStream = new ObjectInputStream(new FileInputStream("B_publicKey.key"));
+						final PublicKey publicKeyB = (PublicKey) inputStream.readObject();
+						System.out.println(publicKeyB);
+						//magic happens
+						//byte[] decHash = model.RSA.decrypt(decrHashBytes, publicKeyB);
+						byte[] decHash = null;
+						{
+							try {
+								// get an RSA cipher object and print the provider
+								final Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+
+								// decrypt the text using the public key
+								cipher.init(Cipher.DECRYPT_MODE, publicKeyB);
+								decHash = cipher.doFinal(decrHashBytes);
+
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
+						}
+						new String(decHash);
+						//byte[] decHash = model.DES.DecryptWithDES(decrHashBytes, "B_publicKey.key");//publickeyvnB
+						
+						//write dectext to file
+						FileOutputStream out2 = new FileOutputStream("HashAfter.txt"); 	
+						out2.write(decHash);
+						out2.close();
+					}
 
 					/*
 					 * Vergelijken verkregen hash met zelf berekende hash
