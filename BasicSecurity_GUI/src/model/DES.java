@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Scanner;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -68,7 +70,7 @@ public class DES {
 
 	}
 
-	public static String DecryptWithDES(byte[] textEncrypted)
+	public static String DecryptWithDES(byte[] textEncrypted, String keyPath)
 	{byte[] textDecrypted = null;
 		try
 		{
@@ -78,19 +80,23 @@ public class DES {
 			// Initialize the same cipher for decryption
 			ObjectInputStream inputStream = null;
 			inputStream = new ObjectInputStream(new FileInputStream(
-					"DESKey.key"));
+					keyPath));
 			desCipher.init(Cipher.DECRYPT_MODE, (Key) inputStream.readObject());
 			inputStream.close();
 
 			// Decrypt the text
 			 textDecrypted = desCipher.doFinal(textEncrypted);
+			 
+			 /*byte[] encryptedBytes = cipher.doFinal(plainBytes);
+ 
+     return encryptedBytes.toString();*/
 
-			System.out.println("Text Decryted : " + new String(textDecrypted));
+			//System.out.println("Text Decryted : " + new String(textDecrypted));
 		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 		
-		return new String(textDecrypted);
+		return Base64.getEncoder().encodeToString(textDecrypted);
 	}
 }
