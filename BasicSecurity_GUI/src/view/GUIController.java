@@ -344,7 +344,12 @@ public class GUIController {
 					while (sc.hasNext()) {
 						encTxt += sc.nextLine();
 					}
-					byte[] encTxtBytes = Base64.getDecoder().decode(encTxt.getBytes());
+					//encryptie: byte[] text = Base64.getEncoder().encode(originalText.getBytes("UTF-8"));
+					System.out.println(encTxt);
+					System.out.println(encTxt.getBytes("UTF-8"));
+					System.out.println(Base64.getDecoder().decode(encTxt));//ERROR
+					System.out.println(Base64.getDecoder().decode(encTxt.getBytes(/*"UTF-8"*/)));
+					byte[] encTxtBytes = Base64.getDecoder().decode(encTxt.getBytes(/*"UTF-8"*/));//ERROR
 
 					String decText = model.DES.DecryptWithDES(encTxtBytes, "DESKey.key");
 

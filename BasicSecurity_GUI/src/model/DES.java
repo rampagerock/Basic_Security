@@ -58,9 +58,10 @@ public class DES {
 				tempText = sc.nextLine();
 				originalText += tempText + "\n";
 			}
+			sc.close();
 
-			text = originalText.getBytes();
-
+			text = Base64.getEncoder().encode(originalText.getBytes("UTF-8"));
+			
 			byte[] textEncrypted = desCipher.doFinal(text);
 			return textEncrypted;
 		} catch (Exception e) {
