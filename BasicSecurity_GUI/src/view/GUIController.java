@@ -236,6 +236,9 @@ public class GUIController {
 				File file1 = new File("File_1.txt");
 				File file2 = new File("File_2.txt");
 				File file3 = new File("File_3.txt");
+				File encryptedMessageFile = new File(textEnc.getText());
+				File privateKeyFile = new File(textPriv.getText());
+				File publicKeyFile = new File(textPub.getText());
 				
 				if (encrypt) {
 					while(textFile.getText().equals("")){
@@ -286,7 +289,7 @@ public class GUIController {
 					inputStream = null;
 
 					//Get public key from file
-					inputStream = new ObjectInputStream(new FileInputStream("B_publicKey.key"));
+					inputStream = new ObjectInputStream(new FileInputStream(publicKeyFile));
 					final PublicKey publicKey = (PublicKey) inputStream.readObject();
 					
 					//Encrypt using public key
@@ -324,7 +327,7 @@ public class GUIController {
 					
 					//Get private key from file
 					encFileArea.appendText("Encrypting Hash using RSA\n");
-					inputStream = new ObjectInputStream(new FileInputStream("A_privateKey.key"));
+					inputStream = new ObjectInputStream(new FileInputStream(privateKeyFile));
 					final PrivateKey privateKey = (PrivateKey) inputStream.readObject();
 					
 					//Encrypt using private key
@@ -351,9 +354,6 @@ public class GUIController {
 					 * Decrypt File2 using Private B 
 					 * get DES Key
 					 */
-					File encryptedMessageFile = new File(textEnc.getText());
-					File privateKeyFile = new File(textPriv.getText());
-					File publicKeyFile = new File(textPub.getText());
 					
 					encFileArea.appendText("\n----------------------------------------------------------------------------------\n");
 					encFileArea.appendText("Decypting " + encryptedMessageFile.getAbsolutePath() + "\n");
