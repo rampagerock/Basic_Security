@@ -1,0 +1,39 @@
+package BasicSecurity_Project;
+
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+public class GUI extends JFrame{
+	private JLabel inputLbl, outputLbl;
+	private JTextArea inputField;
+	private JButton encryptBtn, decryptBtn;
+	private JPanel btnPanel, contentPnl, inputPanel;
+	
+	public GUI(){
+		init();
+	}
+	
+	public void init(){
+		//contentPanel
+		contentPanel = new JPanel(new BorderLayout());
+		
+		//input
+		inputLbl = new JLabel("Input message here : ");
+		inputField = new JTextArea(20, 30);
+		inputPanel = new JPanel();
+		
+		//buttons
+		btnPanel = new JPanel();
+		encryptBtn = new JButton();
+		decryptBtn = new JButton();
+	}
+	
+	
+}

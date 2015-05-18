@@ -73,6 +73,9 @@ public class GUIController {
 	private ToggleGroup rbGroup;
 
 	private boolean encrypt;
+	
+	private File pubKey;
+	private File privKey;
 
 	public GUIController() {
 
@@ -154,9 +157,12 @@ public class GUIController {
 		encFileArea.appendText("\n----------------------------------------------------------------------------------\n");
 		encFileArea.appendText("Generating RSA keys\n");
 		encFileArea.appendText("Public key for " + n1 + " " + new File(n1 + "_publicKey.key").getAbsolutePath() + "\n");
-		encFileArea.appendText("Private key for " + n1 + " " + new File(n1 + "_publicKey.key").getAbsolutePath() + "\n");
+		encFileArea.appendText("Private key for " + n1 + " " + new File(n1 + "_privateKey.key").getAbsolutePath() + "\n");
 		encFileArea.appendText("Public key for " + n2 + " " + new File(n2 + "_publicKey.key").getAbsolutePath() + "\n");
-		encFileArea.appendText("Private key for " + n2 + " " + new File(n2 + "_publicKey.key").getAbsolutePath() + "\n");
+		encFileArea.appendText("Private key for " + n2 + " " + new File(n2 + "_privateKey.key").getAbsolutePath() + "\n");
+		privKey = new File(n1 + "_privateKey.key");
+		pubKey = new File(n2 + "_publicKey.key");
+		
 	}
 
 	public void disableEncrypt() {
@@ -242,9 +248,7 @@ public class GUIController {
 				File file1 = new File("File_1.txt");
 				File file2 = new File("File_2.txt");
 				File file3 = new File("File_3.txt");
-				File encryptedMessageFile = new File(textEnc.getText());
-				File privateKeyFile = new File(textPriv.getText());
-				File publicKeyFile = new File(textPub.getText());
+				
 				
 				if (encrypt) {
 					while(textFile.getText().equals("")){
@@ -295,7 +299,7 @@ public class GUIController {
 					inputStream = null;
 
 					//Get public key from file
-					inputStream = new ObjectInputStream(new FileInputStream(publicKeyFile));
+					inputStream = new ObjectInputStream(new FileInputStream(pubKey));
 					final PublicKey publicKey = (PublicKey) inputStream.readObject();
 					
 					//Encrypt using public key
@@ -333,7 +337,7 @@ public class GUIController {
 					
 					//Get private key from file
 					encFileArea.appendText("Encrypting Hash using RSA\n");
-					inputStream = new ObjectInputStream(new FileInputStream(privateKeyFile));
+					inputStream = new ObjectInputStream(new FileInputStream(privKey));
 					final PrivateKey privateKey = (PrivateKey) inputStream.readObject();
 					
 					//Encrypt using private key
@@ -351,6 +355,10 @@ public class GUIController {
 				}
 
 				if (!encrypt) {
+					File encryptedMessageFile = new File(textEnc.getText());
+					File privateKeyFile = new File(textPriv.getText());
+					File publicKeyFile = new File(textPub.getText());
+					
 					while(textEnc.getText().equals("") || textFile2.getText().equals("") || textFile3.getText().equals("") || textPriv.getText().equals("") || textPub.getText().equals("")){
 						encFileArea.appendText("\n----------------------------------------------------------------------------------\n");
 						encFileArea.appendText("Please provide paths to all the requested files\n");

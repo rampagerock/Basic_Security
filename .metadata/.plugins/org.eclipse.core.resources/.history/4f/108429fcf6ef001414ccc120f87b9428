@@ -1,0 +1,21 @@
+package BasicSecurity_Project;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class GUI extends JFrame{
+	private JLabel inputLbl, outputLbl;
+	private JTextField inputField;
+	private JButton encryptBtn, decryptBtn;
+	private JPanel btnPanel, contentPnl;
+	
+	public GUI(){
+		
+	}
+	
+	
+	
+}
