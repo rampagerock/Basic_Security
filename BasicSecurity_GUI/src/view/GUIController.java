@@ -151,6 +151,12 @@ public class GUIController {
 		String n2 = nameFieldCor.getText();
 		RSA.generateKey(n1);
 		RSA.generateKey(n2);
+		encFileArea.appendText("\n----------------------------------------------------------------------------------\n");
+		encFileArea.appendText("Generating RSA keys\n");
+		encFileArea.appendText("Public key for " + n1 + " " + new File(n1 + "_publicKey.key").getAbsolutePath() + "\n");
+		encFileArea.appendText("Private key for " + n1 + " " + new File(n1 + "_publicKey.key").getAbsolutePath() + "\n");
+		encFileArea.appendText("Public key for " + n2 + " " + new File(n2 + "_publicKey.key").getAbsolutePath() + "\n");
+		encFileArea.appendText("Private key for " + n2 + " " + new File(n2 + "_publicKey.key").getAbsolutePath() + "\n");
 	}
 
 	public void disableEncrypt() {
